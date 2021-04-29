@@ -1,0 +1,21 @@
+{
+  "name": "mockserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc --watch",
+    "serve": "node server.js --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-cors": "0.0.16",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^10.0.0",
+    "typescript": "^4.2.4"
+  }
+}
