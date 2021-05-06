@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-04-29 17:17:57
- * @LastEditTime: 2021-04-29 19:55:44
+ * @LastEditTime: 2021-04-30 09:42:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \mockServer\server.js
@@ -26,13 +26,13 @@ const controller = require('./controller');
 const app = new Koa()
 
 // // 使用middleware:
+app.use(cors())
 app.use(bodyParser());
 app.use(controller());
-app.use(cors())
 // app.use(sslify())
 
 app.listen(3005);
-https.createServer(options, app.callback()).listen(9527, () => {
-  console.log(`server running success at 9527`)
-});
+// https.createServer(options, app.callback()).listen(9527, () => {
+//   console.log(`server running success at 9527`)
+// });
 console.log('app started at port 3005...')
