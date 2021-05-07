@@ -1,13 +1,11 @@
 /*
  * @Author: your name
  * @Date: 2021-04-29 18:14:54
- * @LastEditTime: 2021-05-06 14:15:57
+ * @LastEditTime: 2021-05-07 11:04:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \mockServer\controllers\index.js
  */
-
-const fs = require('fs');
 
 const appId = 'LhGroupBuyApp';
 
@@ -202,5 +200,5 @@ module.exports = {
   'POST /login': login,
   'POST /captcha': captcha,
   'POST /checkAndLogin': checkCaptcha,
-  'POST /userInfo': getUserInfo
+  'POST /userInfo': getUserInfo,
 };

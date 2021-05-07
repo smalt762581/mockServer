@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-04-29 17:17:57
- * @LastEditTime: 2021-04-30 09:42:51
+ * @LastEditTime: 2021-05-07 11:46:10
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \mockServer\server.js
@@ -14,25 +14,32 @@
 //  * @Description: In User Settings Edit
 //  * @FilePath: \mockServer\server.js
 //  */
-// // import Koa, { ParameterizedContext } from 'koa'
-// // import logger from 'koa-logger'
 
+const path = require('path');
 const Koa = require('koa')
 const bodyParser = require('koa-bodyparser');
 const cors = require('koa-cors')
-// const sslify = require('koa-sslify')
+const sslify = require('koa-sslify').default
+const fs = require('fs')
+const http = require('http')
 const https = require('https');
 const controller = require('./controller');
 const app = new Koa()
 
-// // 使用middleware:
+
+// 使用middleware:
 app.use(cors())
+app.use(sslify())
 app.use(bodyParser());
 app.use(controller());
-// app.use(sslify())
 
-app.listen(3005);
-// https.createServer(options, app.callback()).listen(9527, () => {
-//   console.log(`server running success at 9527`)
-// });
-console.log('app started at port 3005...')
+const options = {
+  key: fs.readFileSync(path.join(__dirname, './ssl/ann.key')),
+  cert: fs.readFileSync(path.join(__dirname, './ssl/ann.crt'))
+}
+
+const server = http.createServer(app.callback());
+const httpsServer = https.createServer(options, app.callback())
+
+server.listen(3005, () => console.log('listening 3005'));
+httpsServer.listen(443, () => console.log('listening 443'));
