@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-04-29 18:14:54
- * @LastEditTime: 2021-05-07 11:04:28
+ * @LastEditTime: 2021-05-07 15:12:39
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \mockServer\controllers\index.js
@@ -39,6 +39,16 @@ const enumMap = {
   SUCCESS: '操作成功',
 };
 
+const defineProperty = (obj, proValues) => {
+  const keys = Object.keys(proValues);
+  const pros = keys.reduce(
+    (pre, cur) => ({ ...pre, [cur]: { value: proValues[cur], enumerable: true } }),
+    {}
+  );
+  Object.defineProperties(obj, pros);
+};
+
+
 const isExistUser = (tenant, mobile) => {
   const currentData = validAccount.filter(
     (item) => item.tenant === tenant && item.mobile === mobile
@@ -68,29 +78,24 @@ const login = async (ctx, next) => {
   } else {
     //判断用户是否存在
     const [isExist, currentData] = isExistUser(tenant, mobile);
-    const [ userData ] = currentData;
+    const [userData] = currentData;
     const resBody = {};
     let code = '';
     const innerData = {};
     if (!isExist) {
       code = 'NG_NOT_EXIST';
-      innerData['success'] = false;
+      defineProperty(innerData, { success: false, data: null });
     } else {
       if (password !== userData.password) {
         code = 'NG_PASSWORD';
-        innerData['success'] = false;
-        innerData['data'] = null;
+        defineProperty(innerData, { success: false, data: null });
       } else {
         code = 'SUCCESS';
-        innerData['success'] = true;
-        innerData['data'] = userData;
+        defineProperty(innerData, { success: true, data: userData });
       }
     }
-    innerData['code'] = code;
-    innerData['msg'] = enumMap[code];
-    resBody['msg'] = null;
-    resBody['success'] = true;
-    resBody['data'] = innerData;
+    defineProperty(innerData, { code, msg: enumMap[code] });
+    defineProperty(resBody, { msg: null, success: true, data: innerData });
     ctx.status = 200;
     ctx.response.body = resBody;
   }
@@ -110,8 +115,7 @@ const captcha = async (ctx, next) => {
     const [isExist] = isExistUser(tenant, mobile);
     if (!isExist) {
       code = 'NG_NOT_EXIST';
-      innerData['success'] = false;
-      innerData['data'] = null;
+      defineProperty(innerData, { success: false, data: null });
     } else {
       const verificationCode = generateCaptcha();
       validAccount.forEach((item) => {
@@ -122,14 +126,10 @@ const captcha = async (ctx, next) => {
         }
       });
       code = 'SUCCESS';
-      innerData['success'] = true;
-      innerData['data'] = { verificationCode };
+      defineProperty(innerData, { success: true, data: { verificationCode } });
     }
-    innerData['code'] = code;
-    innerData['msg'] = enumMap[code];
-    resBody['success'] = true;
-    resBody['msg'] = null;
-    resBody['data'] = innerData;
+    defineProperty(innerData, { code, msg: enumMap[code] });
+    defineProperty(resBody, { msg: null, success: true, data: innerData });
     ctx.status = 200;
     ctx.response.body = resBody;
   }
@@ -148,22 +148,17 @@ const checkCaptcha = async (ctx, next) => {
     const innerData = {};
     let rstCode = '';
     const [, currentData] = isExistUser(tenant, mobile);
-    const [ userData ] = currentData;
-    const {verificationCode} = userData;
+    const [userData] = currentData;
+    const { verificationCode } = userData;
     if (verificationCode !== code) {
       rstCode = 'NG_INVALID';
-      innerData['success'] = false;
-      innerData['data'] = null;
+      defineProperty(innerData, { success: false, data: null });
     } else {
       rstCode = 'SUCCESS';
-      innerData['success'] = true;
-      innerData['data'] = userData;
+      defineProperty(innerData, { success: true, data: userData });
     }
-    innerData['code'] = rstCode;
-    innerData['msg'] = enumMap[rstCode];
-    resBody['msg'] = null;
-    resBody['success'] = true;
-    resBody['data'] = innerData;
+    defineProperty(innerData, { code, msg: enumMap[code] });
+    defineProperty(resBody, { msg: null, success: true, data: innerData });
     ctx.status = 200;
     ctx.response.body = resBody;
   }
@@ -173,28 +168,25 @@ const checkCaptcha = async (ctx, next) => {
 const getUserInfo = async (ctx, next) => {
   const { body } = ctx.request;
   const { uuid = '', tenant = '' } = body;
-  const findIndex = validAccount.findIndex(item => item.uuid === uuid && item.tenant === tenant);
+  const findIndex = validAccount.findIndex(
+    (item) => item.uuid === uuid && item.tenant === tenant
+  );
   const isSuccess = findIndex > -1;
   const resBody = {};
   const innerData = {};
   let rstCode = '';
   if (isSuccess) {
     rstCode = 'SUCCESS';
-    innerData['data'] = validAccount[findIndex];
-    innerData['success'] = true;
+    defineProperty(innerData, { data: validAccount[findIndex], success: true });
   } else {
     rstCode = 'NG_IDENTITY';
-    innerData['data'] = null;
-    innerData['success'] = false;
+    defineProperty(innerData, { data: null, success: false });
   }
-  innerData['code'] = rstCode;
-  innerData['msg'] = enumMap[rstCode];
-  resBody['msg'] = null;
-  resBody['success'] = true;
-  resBody['data'] = innerData;
+  defineProperty(innerData, { code: rstCode, msg: enumMap[rstCode] });
+  defineProperty(resBody, { msg: null, success: true, data: innerData });
   ctx.status = 200;
   ctx.response.body = resBody;
-}
+};
 
 module.exports = {
   'POST /login': login,
